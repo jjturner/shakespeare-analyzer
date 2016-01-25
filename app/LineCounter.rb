@@ -9,13 +9,23 @@ class LineCounter
     prelim = speeches.inject([]) do |agg, speech|
       line_count = speech.xpath("./LINE").count
       character = speech.xpath("./SPEAKER").text
-      agg << { character => line_count }
+      agg << { :character => character, :line_count => line_count }
     end
-    prelim.inject do |memo, hash| 
-      memo.merge(hash) do |key, orig, fed| 
-        orig + fed
-      end
-    end
+    result_hash = Hash.new { |hash, key| hash[key] = 0 }
 
+    prelim.each do |e|
+      result_hash[ e[:character]] += e[:line_count]
+    end
+    # result_array = prelim.inject do |memo, hash| 
+     #  memo.merge(hash) do |key, orig, fed| 
+      #   orig + fed
+    #   end
+    # end
+    display(result_hash) 
+    result_hash
+  end
+
+  def display(hash)
+    output = hash.collect {|k,v| "#{v} #{k}"}.join("\n")
   end
 end

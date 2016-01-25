@@ -72,4 +72,11 @@ describe LineCounter do
     # verify
     expect(character_lines).to eq({"Bob"=>4, "Fred"=>2})
   end
+
+  it "outputs results by count, then character" do
+    line_counter = LineCounter.new
+    hash = {"Bob"=>4,"Fred"=>2}
+
+    expect(line_counter.display(hash)).to eq("4 Bob\n2 Fred")
+  end
 end
