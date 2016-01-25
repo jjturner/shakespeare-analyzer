@@ -22,8 +22,6 @@ describe LineCounter do
     # setup
     xml = "<PLAY><SPEECH><SPEAKER>Bob</SPEAKER>"
     xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH>"
-    # xml += "<PLAY><SPEECH><SPEAKER>Fred</SPEAKER>"
-    # xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH></PLAY>"
     xml += "<SPEECH><SPEAKER>Bob</SPEAKER>"
     xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH></PLAY>"
     doc = Nokogiri::XML(xml)
@@ -44,6 +42,27 @@ describe LineCounter do
     xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH>"
     xml += "<SPEECH><SPEAKER>Bob</SPEAKER>"
     xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH></PLAY>"
+    doc = Nokogiri::XML(xml)
+    line_counter = LineCounter.new
+
+    # exercise
+    character_lines = line_counter.lines(doc)
+
+    # verify
+    expect(character_lines).to eq({"Bob"=>4, "Fred"=>2})
+  end
+
+  it "excludes the 'ALL' character designation" do
+    # setup
+    xml = "<PLAY><SPEECH><SPEAKER>Bob</SPEAKER>"
+    xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH>"
+    xml += "<SPEECH><SPEAKER>Fred</SPEAKER>"
+    xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH>"
+    xml += "<SPEECH><SPEAKER>ALL</SPEAKER>"
+    xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH>"
+    xml += "<SPEECH><SPEAKER>Bob</SPEAKER>"
+    xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH></PLAY>"
+
     doc = Nokogiri::XML(xml)
     line_counter = LineCounter.new
 
