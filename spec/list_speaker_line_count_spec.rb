@@ -7,14 +7,13 @@ describe LineCounter do
     # setup
     xml = "<PLAY><SPEECH><SPEAKER>Bob</SPEAKER>"
     xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH></PLAY>"
-    doc = Nokogiri::XML(xml)
-    line_counter = LineCounter.new
+    line_counter = LineCounter.new(xml)
 
     # exercise
-    character_lines = line_counter.lines(doc)
+    character_lines = line_counter.count_lines_per_speech
 
     # verify
-    expect(character_lines).to eq({ "Bob" => 2 })
+    expect(character_lines).to eq([ { "Bob" => 2 } ])
     
   end
 
@@ -24,11 +23,11 @@ describe LineCounter do
     xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH>"
     xml += "<SPEECH><SPEAKER>Bob</SPEAKER>"
     xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH></PLAY>"
-    doc = Nokogiri::XML(xml)
-    line_counter = LineCounter.new
+    line_counter = LineCounter.new(xml)
+    input_array = [{"Bob"=>2}, {"Bob"=>2}] 
 
     # exercise
-    character_lines = line_counter.lines(doc)
+    character_lines = line_counter.sum_lines_by_speaker(input_array)
 
     # verify
     expect(character_lines).to eq({ "Bob" => 4 })
@@ -42,11 +41,11 @@ describe LineCounter do
     xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH>"
     xml += "<SPEECH><SPEAKER>Bob</SPEAKER>"
     xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH></PLAY>"
-    doc = Nokogiri::XML(xml)
-    line_counter = LineCounter.new
+    line_counter = LineCounter.new(xml)
+    input_array = [{"Bob"=>2}, {"Fred"=>2},{"Bob"=>2}] 
 
     # exercise
-    character_lines = line_counter.lines(doc)
+    character_lines = line_counter.sum_lines_by_speaker(input_array)
 
     # verify
     expect(character_lines).to eq({"Bob"=>4, "Fred"=>2})
@@ -63,20 +62,31 @@ describe LineCounter do
     xml += "<SPEECH><SPEAKER>Bob</SPEAKER>"
     xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH></PLAY>"
 
-    doc = Nokogiri::XML(xml)
-    line_counter = LineCounter.new
+    line_counter = LineCounter.new(xml)
 
     # exercise
-    character_lines = line_counter.lines(doc)
+    character_lines = line_counter.count_lines_per_speech
 
     # verify
-    expect(character_lines).to eq({"Bob"=>4, "Fred"=>2})
+    expect(character_lines).to eq([ {"Bob"=>2}, {"Fred"=>2},{"Bob"=>2} ])
   end
 
   it "outputs results by count, then character" do
-    line_counter = LineCounter.new
+    
+    xml = "<PLAY><SPEECH><SPEAKER>Bob</SPEAKER>"
+    xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH>"
+    xml += "<SPEECH><SPEAKER>Fred</SPEAKER>"
+    xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH>"
+    xml += "<SPEECH><SPEAKER>Bob</SPEAKER>"
+    xml += "<LINE>Hello</LINE><LINE>Bye</LINE></SPEECH></PLAY>"
+
+    line_counter = LineCounter.new(xml)
     hash = {"Bob"=>4,"Fred"=>2}
 
     expect(line_counter.display(hash)).to eq("4 Bob\n2 Fred")
+  end
+
+  it "does not accept unformed xml from source" do
+    expect{ LineCounter.new('foo') }.to raise_error(Nokogiri::XML::SyntaxError)
   end
 end
