@@ -1,9 +1,14 @@
 require 'nokogiri'
+require 'open-uri'
 
 class LineCounter
-  def initialize(xml_source)
+  def initialize(xml_source, source_type="local")
     # begin
-    @doc = Nokogiri::XML(xml_source) {|config| config.strict}
+    if source_type == "html"
+      @doc = Nokogiri::XML(open(xml_source)) {|config| config.strict}
+    else
+      @doc = Nokogiri::XML(xml_source) {|config| config.strict}
+    end
     analyze_macbeth
     # rescue Nokogiri::XML::SyntaxError => e
     #   puts "caught exception #{e}"
@@ -13,7 +18,7 @@ class LineCounter
   def analyze_macbeth
     prelim = count_lines_per_speech
     result_hash = sum_lines_by_speaker(prelim)
-    display(result_hash)
+    puts display(result_hash)
   end
 
   def count_lines_per_speech
@@ -41,6 +46,6 @@ class LineCounter
   end
 
   def display(hash)
-    output = hash.collect {|k,v| "#{v} #{k}"}.join("\n")
+    output = hash.sort_by{|k,v|-v}.collect {|k,v| "#{v} #{k}"}.join("\n")
   end
 end

@@ -89,4 +89,11 @@ describe LineCounter do
   it "does not accept unformed xml from source" do
     expect{ LineCounter.new('foo') }.to raise_error(Nokogiri::XML::SyntaxError)
   end
+
+  it "displays results in descending line count order" do
+    lc = LineCounter.new('<foo>bar</foo>')
+    h = {"bob"=>1, "bill"=>2, "bart"=>4, "sue"=>3}
+    expect(lc.display(h)).to eq "4 bart\n3 sue\n2 bill\n1 bob" 
+  end
+  
 end
